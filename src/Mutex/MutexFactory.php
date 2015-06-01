@@ -13,6 +13,19 @@ class MutexFactory
      */
     private $storages = array();
 
+    /**
+     * @var MutexRegistry
+     */
+    private $registry;
+
+    /**
+     * MutexFactory constructor.
+     * @param MutexRegistry $registry
+     */
+    public function __construct(MutexRegistry $registry)
+    {
+        $this->registry = $registry;
+    }
 
     /**
      * @param string $key
@@ -25,7 +38,7 @@ class MutexFactory
             throw new WrongNameMutexException();
         }
 
-        $mutex = MutexRegistry::get($key);
+        $mutex = $this->registry->get($key);
         if ($mutex === null) {
             if ($storageName === null) {
                 if (empty($this->storages)) {
@@ -39,8 +52,8 @@ class MutexFactory
                 $storage = $this->storages[$storageName];
             }
 
-            $mutex = new Mutex($key, $storage);
-            MutexRegistry::add($key, $mutex);
+            $mutex = new Mutex($key, $this->registry, $storage);
+            $this->registry->add($key, $mutex);
         }
 
         return $mutex;

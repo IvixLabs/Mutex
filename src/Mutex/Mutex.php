@@ -19,11 +19,17 @@ class Mutex
      */
     private $storage;
 
+    /**
+     * @var MutexRegistry
+     */
+    private $registry;
 
-    function __construct($key, MutexStorageInterface $storage)
+
+    function __construct($key, MutexRegistry $registry, MutexStorageInterface $storage)
     {
         $this->key = $key;
         $this->storage = $storage;
+        $this->registry = $registry;
     }
 
     /**
@@ -86,7 +92,7 @@ class Mutex
     public function free()
     {
         $this->checkFreeState();
-        MutexRegistry::remove($this->key, $this);
+        $this->registry->remove($this->key, $this);
         $this->free = true;
     }
 
