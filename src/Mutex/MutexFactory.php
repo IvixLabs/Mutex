@@ -30,11 +30,16 @@ class MutexFactory
     /**
      * @param string $key
      * @param string $storageName
+     * @param boolean $keyAutoConvert
      * @return Mutex
      */
-    public function create($key, $storageName = null)
+    public function create($key, $storageName = null, $keyAutoConvert = true)
     {
-        if (preg_match('/[^0-9a-zA-z_]/um', $key)) {
+        if ($keyAutoConvert) {
+            $key = $this->makeMutexKey($key);
+        }
+
+        if (preg_match('/[^0-9a-zA-z_]/um', $key) || strlen($key) > 250) {
             throw new WrongNameMutexException();
         }
 
@@ -73,5 +78,9 @@ class MutexFactory
         $this->storages[$name] = $storage;
     }
 
+    public function makeMutexKey($string)
+    {
+        return preg_replace('/[^0-9a-zA-Z_]+/um', '_', $string);
+    }
 
 }
