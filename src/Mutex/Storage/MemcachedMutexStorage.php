@@ -1,39 +1,39 @@
 <?php
 namespace IvixLabs\Mutex\Storage;
 
+
 use IvixLabs\Mutex\MutexStorageInterface;
 
-class MemcacheMutexStorage implements MutexStorageInterface
+class MemcachedMutexStorage implements MutexStorageInterface
 {
-    const NAME = 'memcache';
+    const NAME = 'memcached';
 
-    private $host;
-    private $port;
+    protected $host;
+    protected $port;
+    private $memcached;
 
     /**
      * MemcacheMutexStorage constructor.
-     * @param $host
-     * @param $port
+     * @param array $settings
      */
-    public function __construct($host = '127.0.0.1', $port = 11211)
+    public function __construct(array $settings)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host = $settings['host'];
+        $this->port = $settings['port'];
     }
 
 
     /**
-     * @return \Memcache
+     * @return \Memcached
      */
     protected function getMemcache()
     {
-        static $memcache;
-        if ($memcache === null) {
-            $memcache = new \Memcache();
-            $memcache->pconnect($this->host, $this->port);
+        if ($this->memcached === null) {
+            $this->memcached = new \Memcached();
+            $this->memcached->addServer($this->host, $this->port);
         }
 
-        return $memcache;
+        return $this->memcached;
     }
 
     /**
@@ -79,5 +79,4 @@ class MemcacheMutexStorage implements MutexStorageInterface
             throw new \RuntimeException(var_export($error, true));
         }
     }
-
 }

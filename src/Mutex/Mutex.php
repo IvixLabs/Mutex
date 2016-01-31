@@ -38,7 +38,7 @@ class Mutex
      * @param int $usleep
      * @return int
      */
-    public function lock($expire = 5, $maxTries = 10, $usleep = 100000)
+    public function lock($expire, $maxTries = 10, $usleep = 100000)
     {
         $this->checkFreeState();
 
