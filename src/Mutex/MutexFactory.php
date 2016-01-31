@@ -40,7 +40,7 @@ class MutexFactory
         }
 
         if (preg_match('/[^0-9a-zA-z_]/um', $key) || strlen($key) > 250) {
-            throw new WrongNameMutexException();
+            throw new WrongNameMutexException($key);
         }
 
         $mutex = $this->registry->get($key);
@@ -80,7 +80,10 @@ class MutexFactory
 
     public function makeMutexKey($string)
     {
-        return preg_replace('/[^0-9a-zA-Z_]+/um', '_', $string);
+        $lowCaseString = mb_strtolower($string, 'UTF-8');
+        $key = preg_replace('/[^0-9a-zA-Z_]+/um', '_', $lowCaseString);
+        $key = substr($key, 0, 250);
+        return $key;
     }
 
 }
