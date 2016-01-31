@@ -9,7 +9,6 @@ class MemcacheMutexStorage implements MutexStorageInterface
 
     private $host;
     private $port;
-    private $memcache;
 
     /**
      * MemcacheMutexStorage constructor.
@@ -26,14 +25,15 @@ class MemcacheMutexStorage implements MutexStorageInterface
     /**
      * @return \Memcache
      */
-    private function getMemcache()
+    protected function getMemcache()
     {
-        if ($this->memcache === null) {
-            $this->memcache = new \Memcache();
-            $this->memcache->pconnect($this->host, $this->port);
+        static $memcache;
+        if ($memcache === null) {
+            $memcache = new \Memcache();
+            $memcache->pconnect($this->host, $this->port);
         }
 
-        return $this->memcache;
+        return $memcache;
     }
 
     /**
