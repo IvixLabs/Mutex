@@ -66,6 +66,7 @@ class Mutex
 
         if ($this->level === 1) {
             if (!$this->storage->delete($this->key)) {
+                $this->level = 0;
                 throw new ExpiredMutexException();
             }
         } else {

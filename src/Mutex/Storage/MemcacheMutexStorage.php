@@ -12,13 +12,12 @@ class MemcacheMutexStorage implements MutexStorageInterface
 
     /**
      * MemcacheMutexStorage constructor.
-     * @param $host
-     * @param $port
+     * @param array $settings
      */
-    public function __construct($host = '127.0.0.1', $port = 11211)
+    public function __construct(array $settings)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host = $settings['host'];
+        $this->port = $settings['port'];
     }
 
 
@@ -46,7 +45,7 @@ class MemcacheMutexStorage implements MutexStorageInterface
     {
         $memcache = $this->getMemcache();
         @trigger_error(null);
-        $result = $memcache->add($name, $value, $expire);
+        $result = @$memcache->add($name, $value, 0, $expire);
         $this->handleLastError();
         return $result;
     }
@@ -79,5 +78,4 @@ class MemcacheMutexStorage implements MutexStorageInterface
             throw new \RuntimeException(var_export($error, true));
         }
     }
-
 }
