@@ -24,6 +24,11 @@ class Mutex
      */
     private $registry;
 
+    /**
+     * @var bool
+     */
+    private $ignoreDestructException = false;
+
 
     function __construct($key, MutexRegistry $registry, MutexStorageInterface $storage)
     {
@@ -102,5 +107,21 @@ class Mutex
         if ($this->free) {
             throw new FreeStateMutexException();
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIgnoreDestructException()
+    {
+        return $this->ignoreDestructException;
+    }
+
+    /**
+     * @param boolean $ignoreDestructException
+     */
+    public function setIgnoreDestructException($ignoreDestructException)
+    {
+        $this->ignoreDestructException = $ignoreDestructException;
     }
 }
