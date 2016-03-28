@@ -14,6 +14,8 @@ class Mutex
 
     private $key;
 
+    private $skipUnlockException = false;
+
     /**
      * @var MutexStorageInterface
      */
@@ -23,11 +25,6 @@ class Mutex
      * @var MutexRegistry
      */
     private $registry;
-
-    /**
-     * @var bool
-     */
-    private $ignoreDestructException = false;
 
 
     function __construct($key, MutexRegistry $registry, MutexStorageInterface $storage)
@@ -71,8 +68,10 @@ class Mutex
 
         if ($this->level === 1) {
             if (!$this->storage->delete($this->key)) {
-                $this->level = 0;
-                throw new ExpiredMutexException();
+                if(!$this->isSkipUnlockException()) {
+                    $this->level = 0;
+                    throw new ExpiredMutexException();
+                }
             }
         } else {
             if ($this->isUnlocked()) {
@@ -109,19 +108,23 @@ class Mutex
         }
     }
 
-    /**
-     * @return boolean
-     */
-    public function isIgnoreDestructException()
+    public function isExists()
     {
-        return $this->ignoreDestructException;
+        return $this->storage->isExists($this->key);
     }
 
     /**
-     * @param boolean $ignoreDestructException
+     * @param $value
      */
-    public function setIgnoreDestructException($ignoreDestructException)
+    public function skipUnlockException($value) {
+        $this->skipUnlockException = $value;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSkipUnlockException()
     {
-        $this->ignoreDestructException = $ignoreDestructException;
+        return $this->skipUnlockException;
     }
 }

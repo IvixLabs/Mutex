@@ -23,4 +23,10 @@ interface MutexStorageInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * @param $name
+     * @return true
+     */
+    public function isExists($name);
 }

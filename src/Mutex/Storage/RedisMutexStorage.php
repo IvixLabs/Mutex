@@ -56,6 +56,12 @@ class RedisMutexStorage implements MutexStorageInterface
         return false;
     }
 
+    public function isExists($name)
+    {
+        // TODO: Implement isExists() method.
+    }
+
+
     /**
      * @param $name
      * @return bool

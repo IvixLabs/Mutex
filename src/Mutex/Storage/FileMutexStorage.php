@@ -89,5 +89,9 @@ class FileMutexStorage implements MutexStorageInterface
         return self::NAME;
     }
 
+    public function isExists($name)
+    {
+        throw new \RuntimeException('This operation not supported');
+    }
 
 }

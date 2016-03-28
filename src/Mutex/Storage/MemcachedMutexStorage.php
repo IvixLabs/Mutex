@@ -26,7 +26,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
     /**
      * @return \Memcached
      */
-    protected function getMemcache()
+    protected function getMemcached()
     {
         if ($this->memcached === null) {
             $this->memcached = new \Memcached();
@@ -44,7 +44,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
      */
     public function add($name, $value, $expire = null)
     {
-        $memcache = $this->getMemcache();
+        $memcache = $this->getMemcached();
         @trigger_error(null);
         $result = $memcache->add($name, $value, $expire);
         $this->handleLastError();
@@ -57,7 +57,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
      */
     public function delete($name)
     {
-        $memcache = $this->getMemcache();
+        $memcache = $this->getMemcached();
         @trigger_error(null);
         $result = @$memcache->delete($name);
         $this->handleLastError();
@@ -79,4 +79,16 @@ class MemcachedMutexStorage implements MutexStorageInterface
             throw new \RuntimeException(var_export($error, true));
         }
     }
+
+    public function isExists($name)
+    {
+        $memcache = $this->getMemcached();
+        if ($memcache->get($name) === false) {
+            return $memcache->getResultCode() !== \Memcached::RES_NOTFOUND;
+        }
+
+        return true;
+    }
+
+
 }

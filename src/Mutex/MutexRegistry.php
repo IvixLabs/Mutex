@@ -58,7 +58,7 @@ class MutexRegistry
     function __destruct()
     {
         foreach ($this->mutexes as $key => $mutex) {
-            if(!$mutex->isIgnoreDestructException()) {
+            if(!$mutex->isSkipUnlockException()) {
                 if (!$mutex->isUnlocked()) {
                     throw new FreeMutexException($key);
                 }
