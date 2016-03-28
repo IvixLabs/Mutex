@@ -1,7 +1,6 @@
 <?php
 namespace IvixLabs\Mutex\Storage;
 
-
 use IvixLabs\Mutex\MutexStorageInterface;
 
 class MemcachedMutexStorage implements MutexStorageInterface
@@ -45,7 +44,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
     public function add($name, $value, $expire = null)
     {
         $memcache = $this->getMemcached();
-        @trigger_error(null);
+        @trigger_error('empty_error');
         $result = $memcache->add($name, $value, $expire);
         $this->handleLastError();
         return $result;
@@ -58,7 +57,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
     public function delete($name)
     {
         $memcache = $this->getMemcached();
-        @trigger_error(null);
+        @trigger_error('empty_error');
         $result = @$memcache->delete($name);
         $this->handleLastError();
         return $result;
@@ -75,7 +74,7 @@ class MemcachedMutexStorage implements MutexStorageInterface
     private function handleLastError()
     {
         $error = error_get_last();
-        if ($error !== null && (!empty($error['message']) || $error['type'] !== E_USER_NOTICE)) {
+        if ($error !== null && $error['message'] == 'empty_error') {
             throw new \RuntimeException(var_export($error, true));
         }
     }

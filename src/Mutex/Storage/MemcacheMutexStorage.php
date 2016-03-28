@@ -25,11 +25,11 @@ class MemcacheMutexStorage implements MutexStorageInterface
     /**
      * @return \Memcache
      */
-    protected function getMemcache()
+    private function getMemcache()
     {
         if ($this->memcache === null) {
             $this->memcache = new \Memcache();
-            $this->memcache->addserver($this->host, $this->port);
+            $this->memcache->pconnect($this->host, $this->port);
         }
 
         return $this->memcache;
@@ -44,7 +44,7 @@ class MemcacheMutexStorage implements MutexStorageInterface
     public function add($name, $value, $expire = null)
     {
         $memcache = $this->getMemcache();
-        @trigger_error(null);
+        @trigger_error('empty_error');
         $result = @$memcache->add($name, $value, 0, $expire);
         $this->handleLastError();
         return $result;
@@ -57,7 +57,7 @@ class MemcacheMutexStorage implements MutexStorageInterface
     public function delete($name)
     {
         $memcache = $this->getMemcache();
-        @trigger_error(null);
+        @trigger_error('empty_error');
         $result = @$memcache->delete($name);
         $this->handleLastError();
         return $result;
@@ -74,7 +74,7 @@ class MemcacheMutexStorage implements MutexStorageInterface
     private function handleLastError()
     {
         $error = error_get_last();
-        if ($error !== null && (!empty($error['message']) || $error['type'] !== E_USER_NOTICE)) {
+        if ($error !== null && $error['message'] == 'empty_error') {
             throw new \RuntimeException(var_export($error, true));
         }
     }
