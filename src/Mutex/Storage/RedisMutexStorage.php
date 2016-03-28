@@ -10,17 +10,11 @@ class RedisMutexStorage implements MutexStorageInterface
     private $host;
     private $port;
 
-    /**
-     * RedisMutexStorage constructor.
-     * @param $host
-     * @param $port
-     */
-    public function __construct($host = '127.0.0.1', $port = 6379)
+    public function __construct(array $settings)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host = $settings['host'];
+        $this->port = $settings['port'];
     }
-
 
     /**
      * @return \Redis
@@ -47,7 +41,7 @@ class RedisMutexStorage implements MutexStorageInterface
         $redis = $this->getRedis();
         if ($redis->setnx($name, $value)) {
             if ($expire !== null) {
-                $redis->set($name, $value, array('xx', 'px' => $expire));
+                $redis->psetex($name, $expire * 1000, $value);
             }
 
             return true;
@@ -58,9 +52,9 @@ class RedisMutexStorage implements MutexStorageInterface
 
     public function isExists($name)
     {
-        // TODO: Implement isExists() method.
+        $redis = $this->getRedis();
+        return $redis->exists($name);
     }
-
 
     /**
      * @param $name

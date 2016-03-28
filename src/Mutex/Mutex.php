@@ -70,12 +70,12 @@ class Mutex
             if (!$this->storage->delete($this->key)) {
                 if(!$this->isSkipUnlockException()) {
                     $this->level = 0;
-                    throw new ExpiredMutexException();
+                    throw new ExpiredMutexException($this->key);
                 }
             }
         } else {
             if ($this->isUnlocked()) {
-                throw new UnlockMutexException();
+                throw new UnlockMutexException($this->key);
             }
         }
         $this->level--;

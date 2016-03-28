@@ -66,16 +66,15 @@ class MutexFactory
 
     /**
      * @param MutexStorageInterface $storage
+     * @param $storageName
      */
-    public function addStorage(MutexStorageInterface $storage)
+    public function addStorage(MutexStorageInterface $storage, $storageName)
     {
-        $name = $storage->getName();
-
-        if (isset($this->storages[$name])) {
+        if (isset($this->storages[$storageName])) {
             throw new StorageExistsMutexException();
         }
 
-        $this->storages[$name] = $storage;
+        $this->storages[$storageName] = $storage;
     }
 
     public function makeMutexKey($string)
