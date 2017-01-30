@@ -62,13 +62,24 @@ class Mutex
         return $attempts;
     }
 
+    public function join()
+    {
+        $this->checkFreeState();
+
+        if ($this->level > 0) {
+            $this->level++;
+        } else {
+            $this->level = 1;
+        }
+    }
+
     public function unlock()
     {
         $this->checkFreeState();
 
         if ($this->level === 1) {
             if (!$this->storage->delete($this->key)) {
-                if(!$this->isSkipUnlockException()) {
+                if (!$this->isSkipUnlockException()) {
                     $this->level = 0;
                     throw new ExpiredMutexException($this->key);
                 }
@@ -116,7 +127,8 @@ class Mutex
     /**
      * @param $value
      */
-    public function skipUnlockException($value) {
+    public function skipUnlockException($value)
+    {
         $this->skipUnlockException = $value;
     }
 

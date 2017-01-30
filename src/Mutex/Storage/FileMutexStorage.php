@@ -27,10 +27,6 @@ class FileMutexStorage implements MutexStorageInterface
      */
     public function add($name, $value, $expire = null)
     {
-        if ($expire !== null) {
-            throw new \LogicException('expire param not supported');
-        }
-
         if (isset($this->locks[$name])) {
             return true;
         }
@@ -38,7 +34,10 @@ class FileMutexStorage implements MutexStorageInterface
         $handler = $this->getFileHandler($name);
         $result = flock($handler, LOCK_EX | LOCK_NB);
         if ($result) {
+            ftruncate($handler, 0);
             $this->locks[$name] = $handler;
+            $expireTime = time() + $expire;
+            fwrite($handler, $expireTime);
         }
         return $result;
     }
@@ -53,8 +52,11 @@ class FileMutexStorage implements MutexStorageInterface
             return false;
         }
         $handler = $this->locks[$name];
+        $now = time();
+        rewind($handler);
+        $expireTime = fread($handler, 20);
         $result = flock($handler, LOCK_UN);
-        return $result;
+        return $result && ($now < $expireTime);
     }
 
     /**
@@ -64,9 +66,9 @@ class FileMutexStorage implements MutexStorageInterface
     private function getFileHandler($name)
     {
         $path = $this->getFilePath($name);
-        $handler = fopen($path, 'w');
+        $handler = fopen($path, 'a+');
         if ($handler === false) {
-            throw new \RuntimeException('Can open file ' . $path);
+            throw new \RuntimeException('Can not open file ' . $path);
         }
 
         return $handler;
@@ -91,7 +93,10 @@ class FileMutexStorage implements MutexStorageInterface
 
     public function isExists($name)
     {
-        throw new \RuntimeException('This operation not supported');
+        $handler = $this->getFileHandler($name);
+        $result = flock($handler, LOCK_EX | LOCK_NB);
+        fclose($handler);
+        return !$result;
     }
 
 }
