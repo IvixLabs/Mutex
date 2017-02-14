@@ -139,4 +139,9 @@ class Mutex
     {
         return $this->skipUnlockException;
     }
+
+    public function getLevel()
+    {
+        return $this->level;
+    }
 }
